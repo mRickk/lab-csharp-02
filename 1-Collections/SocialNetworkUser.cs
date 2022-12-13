@@ -6,27 +6,47 @@ namespace Collections
     public class SocialNetworkUser<TUser> : User, ISocialNetworkUser<TUser>
         where TUser : IUser
     {
+        private Dictionary<string, ICollection<TUser>> _dictionary;
+
         public SocialNetworkUser(string fullName, string username, uint? age) : base(fullName, username, age)
         {
-            throw new NotImplementedException("TODO is there anything to do here?");
+            _dictionary = new Dictionary<string, ICollection<TUser>>();
         }
 
         public bool AddFollowedUser(string group, TUser user)
         {
-            throw new NotImplementedException("TODO add user to the provided group. Return false if the user was already in the group");
+            if (_dictionary.ContainsKey(group)) {
+                if (_dictionary.GetValueOrDefault(group).Contains(user)) {
+                    return false;
+                }
+            } else {
+                _dictionary.Add(group, new List<TUser>());
+            }
+            _dictionary.GetValueOrDefault(group).Add(user);
+            return true;
         }
 
         public IList<TUser> FollowedUsers
         {
             get
             {
-                throw new NotImplementedException("TODO construct and return the list of all users followed by the current users, in all groups");
+                IList<TUser> list = new List<TUser>();
+                foreach(TUser user in _dictionary.Values) {
+                    list.Add(user);
+                }
+                return list;
             }
         }
 
         public ICollection<TUser> GetFollowedUsersInGroup(string group)
         {
-            throw new NotImplementedException("TODO construct and return a collection containing of all users followed by the current users, in group");
+            ICollection<TUser> list = new List<TUser>();
+            if (group != null && _dictionary.ContainsKey(group)) {
+                foreach(TUser user in _dictionary.GetValueOrDefault(group)) {
+                    list.Add(user);
+                }
+            }
+            return list;
         }
     }
 }
